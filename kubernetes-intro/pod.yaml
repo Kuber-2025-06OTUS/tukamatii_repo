@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "homework-1"
+  namespace: homework
+  labels:
+    app: "homework-1"
+spec:
+  containers:
+  - name: myservice
+    image: nginx:1.28.0-alpine
+    ports:
+      - containerPort: 8000
+        name: web
+        protocol: TCP
+    resources:
+      limits:
+        cpu: 200m
+        memory: 500Mi
+      requests:
+        cpu: 10m
+        memory: 20Mi
+    volumeMounts:
+    - mountPath: /homework
+      name: index-dir
+    - mountPath: "/etc/nginx/nginx.conf"
+      name: nginx-config
+      subPath: nginx.conf
+      readOnly: true
+    lifecycle:
+      preStop:
+        exec:
+          command: ["/bin/sh", "-c", "rm -rf /homework"]
+  initContainers:
+  - name: init-myservice
+    image: busybox:1.37.0-glibc
+    command: ['sh', '-c', "wget https://google.com -O /init/index.html" ]
+    volumeMounts:
+    - mountPath: /init
+      name: index-dir
+  volumes:
+  - name: index-dir
+    emptyDir:
+      sizeLimit: 500Mi
+  - name: nginx-config
+    configMap:
+      name: nginx-configmap
+  restartPolicy: Always
