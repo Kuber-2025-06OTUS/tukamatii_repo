@@ -1,0 +1,56 @@
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: random-configmap
+  namespace: homework
+data:
+  heads.html: |
+    <!DOCTYPE html>
+    <html>
+    <body>
+
+    <h1>My First Heading</h1>
+
+    <p>My first paragraph.</p>
+
+    </body>
+    </html>
+  buttons.html: |
+    <!DOCTYPE html>
+    <html>
+    <body>
+
+    <h2>HTML Buttons</h2>
+    <p>HTML buttons are defined with the button tag:</p>
+
+    <button>Click me</button>
+
+    </body>
+    </html>
+  paragraph.html: |
+    <!DOCTYPE html>
+    <html>
+    <body>
+    <p>
+    This paragraph
+    contains a lot of lines
+    in the source code,
+    but the browser
+    ignores it.
+    </p>
+    <p>
+    This paragraph
+    contains      a lot of spaces
+    in the source     code,
+    but the    browser
+    ignores it.
+    </p>
+    <p>
+    The number of lines in a paragraph depends on the size of the browser window. If you resize the browser window,
+     the number of lines in this paragraph will change.
+    </p>
+    </body>
+    </html>
+  user: myname
