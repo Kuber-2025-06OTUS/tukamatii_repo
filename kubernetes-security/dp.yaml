@@ -1,0 +1,77 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: homework
+  labels:
+    app: homework-2
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: homework-2
+  template:
+    metadata:
+      labels:
+        app: "homework-2"
+    spec:
+      serviceAccountName: cd
+      containers:
+        - name: myservice
+          image: nginx:1.28.0-alpine
+          readinessProbe:
+            exec:
+              command:
+                - "/bin/sh"
+                - "-c"
+                - "[ -f /homework/metrics.html ] && true || false"
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          ports:
+            - containerPort: 8000
+              name: web
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 200m
+              memory: 500Mi
+            requests:
+              cpu: 10m
+              memory: 20Mi
+          volumeMounts:
+            - mountPath: /homework
+              name: index-dir
+            - mountPath: "/etc/nginx/nginx.conf"
+              name: nginx-config
+              subPath: nginx.conf
+              readOnly: true
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "rm -rf /homework"]
+      initContainers:
+        - name: init-myservice
+          image: alpine/curl:8.14.1
+          command: ['sh', '-c', 'curl --cacert ${SERVICEACCOUNT}/ca.crt --header "Authorization: Bearer $(cat ${SERVICEACCOUNT}/token)" -X GET ${APISERVER}/metrics -o /init/metrics.html']
+          env:
+            - name: APISERVER
+              value: https://kubernetes.default.svc
+            - name: SERVICEACCOUNT
+              value: /var/run/secrets/kubernetes.io/serviceaccount
+          volumeMounts:
+            - mountPath: /init
+              name: index-dir
+      volumes:
+        - name: index-dir
+          emptyDir:
+            sizeLimit: 500Mi
+        - name: nginx-config
+          configMap:
+            name: nginx-configmap
+      restartPolicy: Always
