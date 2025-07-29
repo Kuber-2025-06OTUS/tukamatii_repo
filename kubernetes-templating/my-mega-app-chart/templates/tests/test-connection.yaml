@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "my-mega-app.fullname" . }}-my-mega-app-connection"
+  labels:
+    {{- include "my-mega-app.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": my-mega-app
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "my-mega-app.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never
