@@ -1,0 +1,16 @@
+---
+
+environments:
+  development:
+  production:
+
+---
+
+releases:
+  - name: kafka
+    createNamespace: true
+    namespace: "{{ .Environment.Name  }}"
+    chart: ./kafka-chart
+    version: 32.3.8
+    values:
+      - ./env/{{ .Environment.Name }}/*.*

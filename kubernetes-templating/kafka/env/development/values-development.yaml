@@ -1,0 +1,22 @@
+---
+image:
+  registry: docker.io
+  repository: bitnami/kafka
+  tag: latest
+
+listeners:
+  client:
+    containerPort: 9092
+    protocol: PLAINTEXT
+    name: CLIENT
+    sslClientAuth: ""
+  interbroker:
+    containerPort: 9094
+    protocol: PLAINTEXT
+    name: INTERNAL
+    sslClientAuth: ""
+
+controller:
+  replicaCount: 1
+broker:
+  replicaCount: 5

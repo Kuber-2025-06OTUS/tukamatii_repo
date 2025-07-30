@@ -1,0 +1,28 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "my-mega-app.serviceAccountName" . }}
+  labels:
+    {{- include "my-mega-app.labels" . | nindent 4 }}
+rules:
+  - nonResourceURLs:
+      - "/metrics"
+    verbs:
+      - get
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name:   {{ include "my-mega-app.serviceAccountName" . }}
+  labels:
+    {{- include "my-mega-app.labels" . | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "my-mega-app.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ include "my-mega-app.serviceAccountName" . }}
+  apiGroup: rbac.authorization.k8s.io

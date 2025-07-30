@@ -1,0 +1,96 @@
+---
+# Default values for my-mega-app.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 3
+
+# Additional update strategy
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+
+# This sets main application container
+appContainer:
+
+  resources:
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# This sets main application container
+initContainer:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# This is for setting Kubernetes Annotations to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+# This is for setting Kubernetes Labels to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels:
+  my-inside-org.labels.io: my-mega-app
+
+traefik:
+  enabled: true
+
+  deployment:
+    # -- Enable deployment
+    enabled: true
+    # -- Deployment or DaemonSet
+    kind: DaemonSet
+
+  # -- Create a default IngressClass for Traefik
+  ingressClass:  # @schema additionalProperties: false
+    enabled: true
+    isDefaultClass: true
+    name: "traefik"
+
+  gateway:
+    # -- When providers.kubernetesGateway.enabled, deploy a default gateway
+    enabled: false
+
+  gatewayClass:  # @schema additionalProperties: false
+    # -- When providers.kubernetesGateway.enabled and gateway.enabled, deploy a default gatewayClass
+    enabled: false
+    # -- Set a custom name to GatewayClass
+
+  # -- Only dashboard & healthcheck IngressRoute are supported. It's recommended to create workloads CR outside of this Chart.
+  ingressRoute:
+    dashboard:
+      # -- Create an IngressRoute for the dashboard
+      enabled: true
+      # -- Additional ingressRoute annotations (e.g. for kubernetes.io/ingress.class)
+
+  updateStrategy:  # @schema additionalProperties: false
+    # -- Customize updateStrategy of Deployment or DaemonSet
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0  # @schema type:[integer, string, null]
+      maxSurge: 1        # @schema type:[integer, string, null]
+
+  providers:  # @schema additionalProperties: false
+    kubernetesCRD:
+      # -- Load Kubernetes IngressRoute provider
+      enabled: true
+      # -- Allows IngressRoute to reference resources in namespace other than theirs
+      allowCrossNamespace: true
+      # -- Allows to reference ExternalName services in IngressRoute
+
+  ports:
+    traefik:
+      port: 8080
