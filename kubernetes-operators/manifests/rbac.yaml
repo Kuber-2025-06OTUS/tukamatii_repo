@@ -1,0 +1,52 @@
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: operators
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mysql-operator
+  namespace: operators
+---
+apiVersion: rbac.authorization.k8s.io/v1   # Версия API для RBAC-ресурсов
+kind: ClusterRole                          # Тип ресурса — ClusterRole для прав на уровне кластера
+metadata:
+  name: mysql-operator   # Имя ClusterRole, совпадает с ServiceAccount
+rules:
+- apiGroups: [""]                 # Core API (без группы) для работы с сервисами
+  resources: ["services"]         # Ресурсы: сервисы Kubernetes
+  verbs: ["get", "list", "watch", "create", "update", "delete"]  # Разрешённые действия над сервисами
+- apiGroups: [""]                          # Core API для работы с событиями
+  resources: ["events"]                    # Ресурсы: события Kubernetes для логирования
+  verbs: ["create", "update", "patch"]     # Разрешённые действия для событий
+- apiGroups: ["apps"]                      # API-группа apps для работы с Deployment
+  resources: ["deployments"]               # Ресурсы: deployments для Redis-инстансов
+  verbs: ["get", "list", "watch", "create", "update", "delete"]  # Разрешённые действия над deployments
+- apiGroups: ["otus.homework"]            # Кастомная API-группа для RedisInstance
+  resources: ["mysqls"]              # Ресурсы: кастомные ресурсы redisinstances
+  verbs: ["get", "list", "watch", "create", "update", "delete", "patch"]  # Полный набор действий, включая патчинг
+- apiGroups: ["apiextensions.k8s.io"]            # API-группа для работы с CRD
+  resources: ["customresourcedefinitions"]       # Ресурсы: CustomResourceDefinitions
+  verbs: ["get", "list", "watch"]                # Только чтение для работы с CRD
+- apiGroups: [""]
+  resources: ["persistentvolumeclaims"]
+  verbs: ["get", "list", "watch", "create", "delete"]
+- apiGroups: [""]
+  resources: ["persistentvolumes "]
+  verbs: ["get", "list", "watch", "create", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1    # Версия API для RBAC-ресурсов
+kind: ClusterRoleBinding                    # Тип ресурса — связывает ClusterRole с ServiceAccount
+metadata:
+  name: mysql-operator    # Имя ClusterRoleBinding, совпадает с ClusterRole
+subjects:
+- kind: ServiceAccount        # Тип субъекта — ServiceAccount
+  name: mysql-operator        # Имя ServiceAccount, которому даются права
+  namespace: operators          # Namespace, где находится ServiceAccount
+roleRef:
+  kind: ClusterRole                      # Тип ресурса, на который ссылаемся
+  name: mysql-operator                   # Имя ClusterRole, предоставляющего права
+  apiGroup: rbac.authorization.k8s.io    # API-группа для ClusterRole
