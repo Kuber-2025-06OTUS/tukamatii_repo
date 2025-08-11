@@ -1,0 +1,11 @@
+---
+apiVersion: otus.homework/v1
+kind: MySQL
+metadata:
+  name: my-redis
+  namespace: operators
+spec:
+  image: mysql:latest
+  database: MyNewDataBase
+  password: My_bestpassword
+  storage_size: 1Gi
