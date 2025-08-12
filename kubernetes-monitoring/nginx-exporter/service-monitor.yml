@@ -1,0 +1,18 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: myapp
+  namespace: homework
+  labels:
+    prometheus: main
+spec:
+  namespaceSelector:
+    matchNames:
+      - homework
+  selector:
+    matchLabels:
+      app: myapp-monitoring
+  endpoints:
+    - port: monitor
+      path: /metrics
