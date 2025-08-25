@@ -1,0 +1,5 @@
+NAME                        TAINTS
+cl1cue72bdhi2bv5hfvq-esem   <none>
+cl1cue72bdhi2bv5hfvq-izen   <none>
+cl1cue72bdhi2bv5hfvq-odoh   <none>
+cl1fd7lspe12gd08fefg-anyp   [map[effect:NoSchedule key:node-role value:infra]]
