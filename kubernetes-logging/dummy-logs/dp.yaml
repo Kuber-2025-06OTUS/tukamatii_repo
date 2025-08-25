@@ -1,0 +1,43 @@
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: homework
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: homework
+  labels:
+    app: homework-2
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: homework-2
+  template:
+    metadata:
+      labels:
+        app: "homework-2"
+    spec:
+      nodeSelector:
+        homework: "true"
+      containers:
+        - name: myservice
+          image: mingrammer/flog
+          resources:
+            limits:
+              cpu: 200m
+              memory: 500Mi
+            requests:
+              cpu: 10m
+              memory: 20Mi
+      restartPolicy: Always
