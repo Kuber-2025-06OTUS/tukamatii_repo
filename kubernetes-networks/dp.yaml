@@ -4,9 +4,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-deployment
-  namespace: homework
+  namespace: otus-argocd-1
   labels:
-    app: homework-3
+    app: otus-argocd-1-3
 spec:
   replicas: 3
   strategy:
@@ -15,11 +15,11 @@ spec:
       maxUnavailable: 1
   selector:
     matchLabels:
-      app: homework-3
+      app: otus-argocd-1-3
   template:
     metadata:
       labels:
-        app: "homework-3"
+        app: "otus-argocd-1-3"
     spec:
       containers:
         - name: myservice
@@ -42,7 +42,7 @@ spec:
               cpu: 10m
               memory: 20Mi
           volumeMounts:
-            - mountPath: /homework
+            - mountPath: /otus-argocd-1
               name: index-dir
             - mountPath: "/etc/nginx/nginx.conf"
               name: nginx-config
@@ -51,7 +51,7 @@ spec:
           lifecycle:
             preStop:
               exec:
-                command: ["/bin/sh", "-c", "rm -rf /homework"]
+                command: ["/bin/sh", "-c", "rm -rf /otus-argocd-1"]
       initContainers:
         - name: init-myservice
           image: busybox:1.37.0-glibc
@@ -67,3 +67,40 @@ spec:
           configMap:
             name: nginx-configmap
       restartPolicy: Always
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-configmap
+  namespace: homework
+data:
+  nginx.conf: |
+    # nginx.conf
+    worker_processes 1;
+
+    events {
+        worker_connections 1024;
+    }
+
+    http {
+        include       mime.types;
+        default_type  application/octet-stream;
+
+        sendfile        on;
+        keepalive_timeout  65;
+
+        server {
+            listen 8000 default_server;
+            server_name _;
+
+            root /homework/;
+
+            index index.html index.htm;
+
+            location / {
+                try_files $uri $uri/ =404;
+            }
+        }
+    }
