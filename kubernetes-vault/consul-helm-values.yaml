@@ -1,0 +1,16 @@
+---
+
+server:
+  replicas: 3
+  disruptionBudget:
+    enabled: true
+    maxUnavailable: 0
+ui:
+  service:
+    enabled: true
+  ingress:
+    enabled: false
+connectInject:
+  enabled: false
+client:
+  enabled: false
