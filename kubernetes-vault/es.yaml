@@ -1,0 +1,18 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: otus-external-secret
+  namespace: demo
+  labels:
+    app: app
+spec:
+  refreshInterval: "15s"
+  secretStoreRef:
+    name: vault-secret-store
+    kind: SecretStore
+  target:
+    name: otus-secret
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: "otus/cred"
