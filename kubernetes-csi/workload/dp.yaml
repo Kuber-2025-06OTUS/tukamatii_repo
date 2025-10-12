@@ -1,0 +1,42 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: homework
+  labels:
+    app: homework-3
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: homework-3
+  template:
+    metadata:
+      labels:
+        app: "homework-3"
+    spec:
+      containers:
+        - name: myservice
+          image: busybox:1.37.0-glibc
+          resources:
+            limits:
+              cpu: 200m
+              memory: 500Mi
+            requests:
+              cpu: 10m
+              memory: 20Mi
+          volumeMounts:
+            - mountPath: /init
+              name: webroot
+          command: ['sh', '-c', "wget https://google.com -O /init/index.html"]
+      volumes:
+        - name: webroot
+          persistentVolumeClaim:
+            claimName: csi-s3-pvc
+      restartPolicy: Always
