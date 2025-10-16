@@ -1,0 +1,26 @@
+# debug-nginx.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: debug-nginx
+  namespace: homework
+spec:
+  nodeName: cl1k346lkgg86gm7thai-iseq
+  hostPID: true
+  hostNetwork: true
+  containers:
+  - name: debugger
+    image: nicolaka/netshoot:v0.13
+    command: ["sleep", "3600"]
+    securityContext:
+      privileged: true
+      runAsUser: 0
+    volumeMounts:
+    - name: host-root
+      mountPath: /host
+      readOnly: true
+  volumes:
+  - name: host-root
+    hostPath:
+      path: /
+  restartPolicy: Never
